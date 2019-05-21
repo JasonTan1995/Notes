@@ -74,6 +74,8 @@ mysql> SELECT FIND_IN_SET('b','a,b,c,d');
 
 [mysql递归查找菜单节点的所有子节点](https://www.cnblogs.com/rainydayfmb/p/8028868.html)
 
+[oracle递归树形结构获取所有父节点，子节点](https://blog.csdn.net/zhanglu1236789/article/details/79104041)
+
 
 
 
