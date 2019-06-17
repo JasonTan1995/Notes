@@ -150,7 +150,51 @@ public Object execute(SqlSession sqlSession, Object[] args) {
     }
   }
 ```
-接下来就到了executor(执行器)这一步了，
+接下来就到了executor(执行器)这一步了，来到这一步就能看到#与$的区别了.`Mybatis`对数据库的所有操作最终都会由executor(执行器来执行).
+默认是会使用SimpleExecutor来执行的.针对查询的这种情况,会调用到doQuery这个方法.
+```java
+public class SimpleExecutor extends BaseExecutor {
+
+  public SimpleExecutor(Configuration configuration, Transaction transaction) {
+    super(configuration, transaction);
+  }
+  
+  @Override
+  public <E> List<E> doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+    Statement stmt = null;
+    try {
+      Configuration configuration = ms.getConfiguration();
+      StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
+      stmt = prepareStatement(handler, ms.getStatementLog());
+      return handler.query(stmt, resultHandler);
+     } finally {
+       closeStatement(stmt);
+    }
+  }
+}
+```
+然后的步骤就是跟原生的jdbc没什么区别了,就先把statement创建出来,然后再由resultSet处理结果.而statement也分为很多种,因此要先通过RoutingStatementHandler来判断要创建哪一种类型的statement.而这个statement如果没有指定的话,默认是PREPARED.
+```java
+// XMLStatementBuilder 该类用来构建MapperStatement的.
+  StatementType statementType = StatementType.valueOf(nodeToHandle.getStringAttribute("statementType", StatementType.PREPARED.toString()));
+```
+```java
+public RoutingStatementHandler(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+    switch (ms.getStatementType()) {
+      case STATEMENT:
+        delegate = new SimpleStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);
+        break;
+      case PREPARED:
+        delegate = new PreparedStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);
+        break;
+      case CALLABLE:
+        delegate = new CallableStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);
+        break;
+      default:
+        throw new ExecutorException("Unknown statement type: " + ms.getStatementType());
+    }
+  }
+```
 
 
 4. `Mybatis-Plus`中的分页使用
