@@ -561,6 +561,8 @@ private static class BindingTokenParser implements TokenHandler {
 
 [Mybatis系列从源码角度理解Mybatis的$和#的作用](https://juejin.im/post/59c8c20c5188257e70534228)
 
+[Mybatis解析动态sql原理分析](https://www.cnblogs.com/fangjian0423/p/mybaits-dynamic-sql-analysis.html)
+
 
 
 
