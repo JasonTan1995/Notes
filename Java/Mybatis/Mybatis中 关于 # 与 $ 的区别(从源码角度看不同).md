@@ -1,12 +1,11 @@
 ### Mybatis中 关于 # 与 $ 的区别(从源码角度看不同)
 
-***
-#####  概述
+####  1.概述
 这个老问题面试经常会在问，网上的答案也有很多。但最近再问问自己，脑海中居然整理不出来答案；因此站在源码的角度来分析一下这两个符号的区别吧。(能比较深刻地记忆下来)
 
-#####  源码解析
+####  2.源码解析
 ***
-#### `SqlSource`
+##### `SqlSource`
 
 `MappedStatement`
 
@@ -163,7 +162,7 @@ public SqlSource parseScriptNode() {
 
 ![](https://ws1.sinaimg.cn/large/6b297ce5ly1g463q0fyewj21120bkzm4.jpg)
 
-#### `TokenHandler`
+##### `TokenHandler`
 
 说了那么多,还没到重点.以上只是一些准备工作,那究竟#与$符号是在什么时候被替换的呢?
 
@@ -559,15 +558,21 @@ private static class BindingTokenParser implements TokenHandler {
 #### 总结
 
 1. #符号会被转化成?占位符,而且`Mybatis`中默认会使用PreparedStatement.因此会进行预编译防止了`SQL`注入.
-2. #符号还会进行参数的类型匹配.
+2. #符号还会进行参数的类型匹配.例如:select * from user where id = #{id},假设传入字段的值为12，如果id的数据库类型为字符型的话,那么#{id}表示的就是‘12’，如果id的数据库类型为整型的话,#{id}表示的就是12.而select * from tablename where id = ${id}
+如果字段id为整型，sql语句就不会出错，但是如果字段id为字符型， 那么sql语句应该写成select * from table where id = '${id}'
 3. $符号不会进行预编译,而是直接参数替换,因此有可能会引出`SQL`注入.
 
 
 参考资料:
 
+[Mybatis解析动态sql原理分析](https://www.cnblogs.com/fangjian0423/p/mybaits-dynamic-sql-analysis.html)
+
+[MyBatis中井号与美元符号的区别](https://www.cnblogs.com/Allen-Wei/p/9025536.html)
+
 [Mybatis系列从源码角度理解Mybatis的$和#的作用](https://juejin.im/post/59c8c20c5188257e70534228)
 
-[Mybatis解析动态sql原理分析](https://www.cnblogs.com/fangjian0423/p/mybaits-dynamic-sql-analysis.html)
+
+
 
 
 
