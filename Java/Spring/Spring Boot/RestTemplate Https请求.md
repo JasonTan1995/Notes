@@ -71,7 +71,7 @@ public class SimpleClientHttpRequestFactory implements ClientHttpRequestFactory,
     }
 ```
 
-- 因此,我们可以根据该类来重写一个新的类用于跳过证书验证
+- 因此,我们可以根据该类来重写一个新的类用于跳过证书验证,这个类其实在`spring-boot-actuator-autoconfigure`的jar包中,但该类是不对外暴露的,因此只需要将这个类搬出来就行了.
 ```java
 public class SkipSslVerificationHttpRequestFactory extends SimpleClientHttpRequestFactory {
 
